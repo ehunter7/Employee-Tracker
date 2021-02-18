@@ -62,16 +62,16 @@ function add() {
       },
     ])
     .then((answer) => {
-      console.log(answer.addingWhat);
+      console.log("this is the answer: " + answer.addingWhat);
 
-      switch (answer.addingwhat) {
-        case `Department`:
+      switch (answer.addingWhat) {
+        case "Department":
           addDepartment();
           break;
-        case `Role`:
+        case "Role":
           addRole();
           break;
-        default:
+        case "Employee":
           addEmployee();
           break;
       }
@@ -89,8 +89,8 @@ function addDepartment() {
     ])
     .then((answer) => {
       connection.query(
-        `INSERT INTO ? (name) VALUE ?`,
-        [shuttle, answer.input],
+        `INSERT INTO department SET ?`,
+        { name: answer.input },
         (err, result) => {
           if (err) throw err;
           console.log(`input added!`);
@@ -99,11 +99,19 @@ function addDepartment() {
     });
 }
 
-function addRole() {
-  connection.query(`SELECT name, id FROM  department`, (err, result) => {
+function getDepartments() {
+  connection.query(`SELECT * FROM  department`, (err, result) => {
     if (err) throw err;
-    console.log(`names of departments ${result}`);
+    console.table(result);
+    return result;
   });
+}
+
+function addRole() {
+  console.log("adding role");
+
+  const departments = getDepartments();
+  console.log(departments);
 
   inquirer
     .prompt([
