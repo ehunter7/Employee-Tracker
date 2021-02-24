@@ -33,7 +33,7 @@ function beginningPrompt() {
         type: `list`,
         name: `command`,
         message: `select what you would like to do`,
-        choices: [`Add`, `View`, `Update`],
+        choices: [`Add`, `View`, `Update`, 'Delete'],
       },
     ])
     .then((answer) => {
@@ -94,9 +94,9 @@ function addDepartment() {
         (err, result) => {
           if (err) throw err;
           console.log(`input added!`);
+          beginningPrompt();
         }
       );
-      beginningPrompt();
     });
 }
 
@@ -135,9 +135,9 @@ function addRole() {
               (err, result) => {
                 if (err) throw err;
                 console.log(`role added`);
+                beginningPrompt();
               }
             );
-            beginningPrompt();
           }
         );
       });
@@ -178,9 +178,9 @@ function addEmployee() {
               (err, result) => {
                 if (err) throw err;
                 console.log(`Employee added!`);
+                beginningPrompt();
               }
             );
-            beginningPrompt();
           }
         );
       });
@@ -216,7 +216,19 @@ function update() {
       },
     ])
     .then((answer) => {
-      console.log(answer);
+
+      switch(answer.updatingWhat){
+        case 'Department':
+          updatingDepartment();
+        break;
+        case 'Role':
+          updatingRole();
+        break;
+        case 'Employee':
+          updatingEmployee();
+        break;
+      };
+
       beginningPrompt();
     });
 }
@@ -243,7 +255,10 @@ function updateDepartment() {
         connection.query(
           "INSERT INTO department (name) WHERE ? VALUE (?)",
           [{ name: answer.update }, answer.updated],
-          (err, res) => console.log("Department updated!")
+          (err, res) => {
+            console.log("Department updated!");
+            beginningPrompt();
+          }
         );
       });
   });
@@ -276,7 +291,10 @@ function updateRole() {
         connection.query(
           "INSERT INTO role (title, salary) WHERE ? VALUE (?, ?)",
           [{ title: answer.update }, answer.updated, answer.updatedSalary],
-          (err, res) => console.log("Role updated!")
+          (err, res) => {
+            console.log('Role updated!');
+            beginningPrompt();
+          }
         );
       });
   });
@@ -316,13 +334,22 @@ function updateEmployee() {
         .then((answer) => {
           connection.query(
             "INSERT INTO employee (first_name, last_name, role) WHERE ? VALUE (?, ?, ?)",
-            [{ first_name: answer.update },  answer.updatedFirst, answer.updatedLast, answer.updated],
-            (err, res) => console.log("Employee updated!")
+            [
+              { first_name: answer.update },
+              answer.updatedFirst,
+              answer.updatedLast,
+              answer.updated,
+            ],
+            (err, res) => {
+              console.log('Employee updated!');
+              beginningPrompt();
+            }
           );
         });
     });
   });
 }
 //TODO create delete functions
+function 
 
 beginningPrompt();
