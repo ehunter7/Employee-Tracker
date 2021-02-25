@@ -219,13 +219,13 @@ function update() {
     .then((answer) => {
       switch (answer.updatingWhat) {
         case "Department":
-          updatingDepartment();
+          updateDepartment();
           break;
         case "Role":
-          updatingRole();
+          updateRole();
           break;
         case "Employee":
-          updatingEmployee();
+          updateEmployee();
           break;
       }
 
