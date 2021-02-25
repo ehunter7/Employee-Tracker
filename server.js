@@ -33,7 +33,7 @@ function beginningPrompt() {
         type: `list`,
         name: `command`,
         message: `select what you would like to do`,
-        choices: [`Add`, `View`, `Update`, 'Delete'],
+        choices: [`Add`, `View`, `Update`, "Delete"],
       },
     ])
     .then((answer) => {
@@ -46,6 +46,9 @@ function beginningPrompt() {
           break;
         case `Update`:
           update();
+          break;
+        case "Delete":
+          mDelete();
           break;
       }
     });
@@ -62,8 +65,6 @@ function add() {
       },
     ])
     .then((answer) => {
-      console.log("this is the answer: " + answer.addingWhat);
-
       switch (answer.addingWhat) {
         case "Department":
           addDepartment();
@@ -216,18 +217,17 @@ function update() {
       },
     ])
     .then((answer) => {
-
-      switch(answer.updatingWhat){
-        case 'Department':
+      switch (answer.updatingWhat) {
+        case "Department":
           updatingDepartment();
-        break;
-        case 'Role':
+          break;
+        case "Role":
           updatingRole();
-        break;
-        case 'Employee':
+          break;
+        case "Employee":
           updatingEmployee();
-        break;
-      };
+          break;
+      }
 
       beginningPrompt();
     });
@@ -292,7 +292,7 @@ function updateRole() {
           "INSERT INTO role (title, salary) WHERE ? VALUE (?, ?)",
           [{ title: answer.update }, answer.updated, answer.updatedSalary],
           (err, res) => {
-            console.log('Role updated!');
+            console.log("Role updated!");
             beginningPrompt();
           }
         );
@@ -341,7 +341,7 @@ function updateEmployee() {
               answer.updated,
             ],
             (err, res) => {
-              console.log('Employee updated!');
+              console.log("Employee updated!");
               beginningPrompt();
             }
           );
@@ -349,7 +349,105 @@ function updateEmployee() {
     });
   });
 }
-//TODO create delete functions
-function 
+
+function mDelete() {
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "deleteWhat",
+        message: "What would you like to delete?",
+        choices: ["department", "role", "employee"],
+      },
+    ])
+    .then((answer) => {
+      switch (answer.deleteWhat) {
+        case "department":
+          deleteDepartment();
+          break;
+        case "role":
+          deleteRole();
+          break;
+        case "employee":
+          break;
+      }
+    });
+}
+
+function deleteDepartment() {
+  connection.query("SELECT name FROM department", (err, res) => {
+    if (err) throw err;
+
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "deletingWhat",
+          message: "Select which department you would like to delete.",
+          choices: [...res],
+        },
+      ])
+      .then((answer) => {
+        connection.query(
+          `DELETE department WHERE name = ?`,
+          "answer.deletingWhat",
+          (err, res) => {
+            console.log("Department Deleted!");
+            beginningPrompt();
+          }
+        );
+      });
+  });
+}
+
+function deleteRole() {
+  connection.query("SELECT title FROM role", (err, res) => {
+    if (err) throw err;
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "deletingWhat",
+          message: "Select which role you would like to delete.",
+          choices: [...res],
+        },
+      ])
+      .then((answer) => {
+        connection.query(
+          "DELETE role WHERE title = ?",
+          "answer.deleteWhat",
+          (err, res) => {
+            console.log("Role Delted!");
+            beginningPrompt();
+          }
+        );
+      });
+  });
+}
+
+function deleteEmployee() {
+  connection.query("SELECT last_name FROM employee", (err, res) => {
+    if (err) throw err;
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "deleteWhat",
+          message: "Select which employee to remove by last name.",
+          choices: [...res],
+        },
+      ])
+      .then((answer) => {
+        connection.query(
+          `DELETE employee WHERE last_name = ?`,
+          "answer.deleteWhat",
+          (err, res) => {
+            console.log("Employee Deleted!");
+            beginningPrompt();
+          }
+        );
+      });
+  });
+}
 
 beginningPrompt();
