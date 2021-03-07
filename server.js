@@ -1,7 +1,7 @@
 const express = require(`express`);
 const mysql = require(`mysql`);
 const inquirer = require(`inquirer`);
-require('dotenv').config();
+require("dotenv").config();
 
 const app = express();
 
@@ -14,7 +14,7 @@ const connection = mysql.createConnection({
   host: `localhost`,
   port: 3306,
   user: `root`,
-  password:  process.env.DBPASSWORD,
+  password: process.env.DBPASSWORD,
   database: `employeeManagement_db`,
 });
 
@@ -142,7 +142,6 @@ function addRole() {
         },
       ])
       .then((answer) => {
-
         connection.query(
           `SELECT id FROM department WHERE name = "${answer.department}"`,
           (err, res) => {
@@ -166,6 +165,7 @@ function addRole() {
 function addEmployee() {
   connection.query(`SELECT title FROM role`, (err, result) => {
     if (err) throw err;
+    console.log(JSON.stringify(result));
     inquirer
       .prompt([
         {
@@ -407,8 +407,7 @@ function deleteDepartment() {
       ])
       .then((answer) => {
         connection.query(
-          `DELETE department WHERE name = ?`,
-          "answer.deletingWhat",
+          `DELETE FROM department WHERE name = "${answer.deletingWhat}"`,
           (err, res) => {
             console.log("Department Deleted!");
             askAgain();
@@ -432,8 +431,8 @@ function deleteRole() {
       ])
       .then((answer) => {
         connection.query(
-          "DELETE role WHERE title = ?",
-          "answer.deleteWhat",
+          'DELETE FROM role WHERE title = "?"',
+          answer.deleteWhat,
           (err, res) => {
             console.log("Role Delted!");
             askAgain();
@@ -457,8 +456,8 @@ function deleteEmployee() {
       ])
       .then((answer) => {
         connection.query(
-          `DELETE employee WHERE last_name = ?`,
-          "answer.deleteWhat",
+          `DELETE FROM employee WHERE last_name = "?"`,
+          answer.deleteWhat,
           (err, res) => {
             console.log("Employee Deleted!");
             askAgain();
