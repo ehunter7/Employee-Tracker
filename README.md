@@ -5,4 +5,4 @@ User is asked a series of questions which will dictate whether the user would li
 
 Program is initialized by entering "node server" in the terminal.
 
-- [GitHub Repositor](https://github.com/ehunter7/Employee-Tracker)
+- [GitHub Repository](https://github.com/ehunter7/Employee-Tracker)
