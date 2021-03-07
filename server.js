@@ -1,6 +1,7 @@
 const express = require(`express`);
 const mysql = require(`mysql`);
 const inquirer = require(`inquirer`);
+require('dotenv').config();
 
 const app = express();
 
@@ -13,8 +14,8 @@ const connection = mysql.createConnection({
   host: `localhost`,
   port: 3306,
   user: `root`,
-  password: process.env.DBPASSWORD,
-  database: `EmployeeManagement_db`,
+  password:  process.env.DBPASSWORD,
+  database: `employeeManagement_db`,
 });
 
 connection.connect((err) => {
@@ -51,6 +52,23 @@ function beginningPrompt() {
           mDelete();
           break;
       }
+    });
+}
+
+function askAgain() {
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "choice",
+        message: "Would you like to continue?",
+        choices: ["YES", "NO"],
+      },
+    ])
+    .then((answer) => {
+      if (answer.choice === "YES") {
+        beginningPrompt();
+      } else return;
     });
 }
 
@@ -95,7 +113,7 @@ function addDepartment() {
         (err, result) => {
           if (err) throw err;
           console.log(`input added!`);
-          beginningPrompt();
+          askAgain();
         }
       );
     });
@@ -124,19 +142,19 @@ function addRole() {
         },
       ])
       .then((answer) => {
-        const depId = toString(answer.department);
+
         connection.query(
-          `SELECT id FROM department WHERE name = depId`,
+          `SELECT id FROM department WHERE name = "${answer.department}"`,
           (err, res) => {
-            console.log({ res });
+            console.log(res[0].id);
 
             connection.query(
               `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`,
-              [answer.title, answer.salary, res],
+              [answer.title, answer.salary, res[0].id],
               (err, result) => {
                 if (err) throw err;
                 console.log(`role added`);
-                beginningPrompt();
+                askAgain();
               }
             );
           }
@@ -179,7 +197,7 @@ function addEmployee() {
               (err, result) => {
                 if (err) throw err;
                 console.log(`Employee added!`);
-                beginningPrompt();
+                askAgain();
               }
             );
           }
@@ -195,13 +213,13 @@ function view() {
         type: `list`,
         name: `viewingWhat`,
         message: `What would you like to view?`,
-        choices: [`Department`, `Role`, `Employee`],
+        choices: [`department`, `role`, `employee`],
       },
     ])
     .then((answer) => {
       connection.query(`SELECT * FROM ${answer.viewingWhat}`, (err, res) => {
         console.table(res);
-        beginningPrompt();
+        askAgain();
       });
     });
 }
@@ -229,7 +247,7 @@ function update() {
           break;
       }
 
-      beginningPrompt();
+      askAgain();
     });
 }
 
@@ -257,7 +275,7 @@ function updateDepartment() {
           [{ name: answer.update }, answer.updated],
           (err, res) => {
             console.log("Department updated!");
-            beginningPrompt();
+            askAgain();
           }
         );
       });
@@ -293,7 +311,7 @@ function updateRole() {
           [{ title: answer.update }, answer.updated, answer.updatedSalary],
           (err, res) => {
             console.log("Role updated!");
-            beginningPrompt();
+            askAgain();
           }
         );
       });
@@ -342,7 +360,7 @@ function updateEmployee() {
             ],
             (err, res) => {
               console.log("Employee updated!");
-              beginningPrompt();
+              askAgain();
             }
           );
         });
@@ -393,7 +411,7 @@ function deleteDepartment() {
           "answer.deletingWhat",
           (err, res) => {
             console.log("Department Deleted!");
-            beginningPrompt();
+            askAgain();
           }
         );
       });
@@ -418,7 +436,7 @@ function deleteRole() {
           "answer.deleteWhat",
           (err, res) => {
             console.log("Role Delted!");
-            beginningPrompt();
+            askAgain();
           }
         );
       });
@@ -443,7 +461,7 @@ function deleteEmployee() {
           "answer.deleteWhat",
           (err, res) => {
             console.log("Employee Deleted!");
-            beginningPrompt();
+            askAgain();
           }
         );
       });
